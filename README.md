@@ -2,6 +2,11 @@
 
 Converts iTerm2's *.itemcolors to a gnome-terminal profile.
 
+## Prerequisites
+* Python 3.7 or newer
+
+These scripts do not depend on any third-party libraries.
+
 ## Usage
 
     $ ./iterm-colors-to-gnome-terminal.py [*.itemcolors file]
