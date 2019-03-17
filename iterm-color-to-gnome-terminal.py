@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.7
 
+import os
 import sys
+import uuid
 import json
 import plistlib
 
@@ -16,6 +18,20 @@ def _rgb_to_hex(values):
 
     return f"#{r}{g}{b}"
 
+def _create_gnome_terminal_profile(name, gconf_keys):
+    profile_id = str(uuid.uuid4())
+
+    profile_contents = f"[:{profile_id}]\n"
+    profile_contents += f"visible-name='{name}'\n"
+
+    for key, value in gconf_keys.items():
+        if isinstance(value, list):
+            encoded_values = ', '.join([f"'{item}'" for item in value])
+            profile_contents += f"{key}=[{encoded_values}]\n"
+        else:
+            profile_contents += f"{key}='{value}'\n"
+
+    return profile_contents
 
 def main():
     if len(sys.argv) < 2:
@@ -50,10 +66,10 @@ def main():
         if not value:
             sys.stderr.write("warning: missing ANSI color {index}\n")
 
-    gconf_keys["palette"] = ",".join(gconf_keys["palette"])
+    profile_name = os.path.splitext(file_name)[0]
+    profile = _create_gnome_terminal_profile(profile_name, gconf_keys)
 
-    for key, value in gconf_keys.items():
-        print(f"{key} {value}")
+    print(profile)
 
     return 0
 
