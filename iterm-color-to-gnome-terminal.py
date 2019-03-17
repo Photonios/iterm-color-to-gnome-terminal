@@ -4,6 +4,7 @@ import os
 import sys
 import uuid
 import json
+import argparse
 import plistlib
 
 
@@ -34,12 +35,13 @@ def _create_gnome_terminal_profile(name, gconf_keys):
     return profile_contents
 
 def main():
-    if len(sys.argv) < 2:
-        sys.stderr.write("usage: iterm-color-to-gnome-terminal.py [*.itermcolors file]\n")
-        return 1
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file_name", help="Name of the *.itermcolors file to convert")
+    parser.add_argument("-n", "--profile-name", type=str, help="Name to give to the result file name (default is the file name)")
 
-    file_name = sys.argv[1]
-    with open(file_name, "rb") as fp:
+    args = parser.parse_args()
+
+    with open(args.file_name, "rb") as fp:
         file_contents = fp.read()
 
     gconf_keys = dict()
@@ -66,7 +68,7 @@ def main():
         if not value:
             sys.stderr.write("warning: missing ANSI color {index}\n")
 
-    profile_name = os.path.splitext(file_name)[0]
+    profile_name = args.profile_name or os.path.splitext(args.file_name)[0]
     profile = _create_gnome_terminal_profile(profile_name, gconf_keys)
 
     print(profile)
